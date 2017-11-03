@@ -25,15 +25,6 @@ def setup_directory(name):
 """
 def collect_meta_data(dir_name, driver):
     
-    # Declare all variables to be thread local
-    owner = threading.local()
-    title = threading.local()
-    description = threading.local()
-    viewers = threading.local()
-    likesNdislikes = threading.local()
-    likes = threading.local()
-    dislikes = threading.local()
-    
     # Get meta_data
     owner = driver.find_element_by_xpath('//yt-formatted-string[@id="owner-name"]').text
     title = driver.find_element_by_class_name('title').text
@@ -44,7 +35,6 @@ def collect_meta_data(dir_name, driver):
     dislikes = likesNdislikes[1].text
 
     # Write meta_data to a text file
-    textfile = threading.local()
     textfile = open(dir_name + "/meta_data.txt", "w")
     textfile.write("Owner:          " + owner.encode('utf-8') + "\n")
     textfile.write("Title:          " + title.encode('utf-8') + "\n")
@@ -76,33 +66,25 @@ class height_has_changed(object):
 def stream_comments(dir_name, driver):
     
     # Create a file called comments.txt
-    textfile = threading.local()
     textfile = open(dir_name + "/comments.txt", "w")
 
     # Switch frame and intialize variables for detecting new comments
     driver.switch_to_frame('chatframe')
-    currentStyle = threading.local()
-    currentSize = threading.local()
     currentStyle = driver.find_element_by_id('item-offset').get_attribute('style')
     currentSize = len(driver.find_elements_by_tag_name('yt-live-chat-text-message-renderer'))
 
     # Loop that continuous detect new comments, then write to comments.txt
     while True:
-        element = threading.local()
         element = WebDriverWait(driver, 40).until(
             height_has_changed((By.ID, 'item-offset'), currentStyle)
         )
         
-        comments = threading.local()
         comments = driver.find_elements_by_tag_name('yt-live-chat-text-message-renderer')
         
-        lastFew = threading.local()
         lastFew = len(comments) - currentSize
-        commentsToPrint = threading.local()
         commentsToPrint = comments[-1*lastFew:]
         
         for comment in commentsToPrint:
-            localtime = threading.local()
             localtime = time.asctime(time.localtime(time.time()))
             print "[", localtime, "]", \
                     comment.find_element_by_id('author-name').text, \
@@ -115,6 +97,7 @@ def stream_comments(dir_name, driver):
         currentSize = len(comments)
 
 
+
 """
     Worker function that take screenshots every minute
 """
@@ -123,7 +106,9 @@ def screenshot(dir_name, driver):
     # While loop that takes a screenshot every minute
     while True:
         driver.save_screenshot(dir_name + "/screenshots/" + str(time.time()) + ".png")
+        
         time.sleep(60)
+
 
     
 """
@@ -132,7 +117,6 @@ def screenshot(dir_name, driver):
 def crawl_link(url):
     
     # Start an instance of browser
-    driver1 = threading.local()
     driver1 = webdriver.Chrome()
     driver1.get(url)
 
@@ -140,7 +124,6 @@ def crawl_link(url):
     time.sleep(2)
 
     # Access title of the stream and set up directory
-    title = threading.local()
     title = driver1.find_element_by_class_name('title').text
     
     title = re.sub("/", "-", title)
@@ -148,10 +131,8 @@ def crawl_link(url):
     setup_directory(title)
 
     # Create a new thread that take screenshot every minute
-    driver2 = threading.local()
     driver2 = webdriver.Chrome()
     driver2.get(url)
-    t = threading.local()
     t = threading.Thread(target = screenshot, args=(title, driver2,))
     t.start()
     
