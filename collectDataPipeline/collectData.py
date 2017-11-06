@@ -3,6 +3,7 @@ import re
 import sys
 import time
 import threading
+import logging
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -63,7 +64,7 @@ class height_has_changed(object):
 """
     Stream comments and write them to comments.txt
 """
-def stream_comments(dir_name, driver):
+def stream_comments(dir_name, driver, shutdown):
     
     # Create a file called comments.txt
     textfile = open(dir_name + "/comments.txt", "w")
@@ -96,6 +97,11 @@ def stream_comments(dir_name, driver):
         currentStyle = driver.find_element_by_id('item-offset').get_attribute('style')
         currentSize = len(comments)
 
+        # Check flags to see if it's time to shut down
+        if shutdown():
+            break
+
+
 
 
 """
@@ -114,7 +120,7 @@ def screenshot(dir_name, driver):
 """
     Worker function that gets meta_data and stream comments
 """
-def crawl_link(url):
+def crawl_link(url, shutdown):
     
     # Start an instance of browser
     driver1 = webdriver.Chrome()
@@ -133,7 +139,9 @@ def crawl_link(url):
     # Create a new thread that take screenshot every minute
     driver2 = webdriver.Chrome()
     driver2.get(url)
+    print("Starting thread for screenshot")
     t = threading.Thread(target = screenshot, args=(title, driver2,))
+    t.setDaemon(True) # ends screenshot thread when exiting program
     t.start()
     
 
@@ -141,7 +149,11 @@ def crawl_link(url):
     collect_meta_data(title, driver1)
 
     # Collect comments and write them to comments.txt
-    stream_comments(title, driver1)
+    print("Starting comments streaming")
+    stream_comments(title, driver1, shutdown)
+
+    driver1.close()
+    driver2.close()
 
 
 

@@ -1,4 +1,5 @@
 import sys
+import logging
 import threading
 from collectData import *
 from selenium import webdriver
@@ -60,12 +61,26 @@ if __name__ == "__main__":
     links = list()
     links = get_links(keyword, number)
 
+    # Set flag and lock for shutdown
+    shutdown = False
+    threads = []
+
     # Start threads to crawl data
     for link in links:
-        print "starting thread"
-        t = threading.Thread(target = crawl_link, args=(link,))
-        t.setDaemon(True)
+        print("Starting thread for link...")
+        t = threading.Thread(target = crawl_link, args=(link, lambda: shutdown,))
+        threads.append(t)
         t.start()
-
+    
+    # This blocks specified timeout
+    print("Beginning countdown...")
     time.sleep(timeout*60)
+
+    # Change flag to signal threads to shutdown
+    shutdown = True
+    print("Preparing to shutdown...")
+
+    for t in threads:
+        t.join()
+
     sys.exit(0)

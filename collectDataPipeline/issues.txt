@@ -1,0 +1,3 @@
+Known bugs
+- When a directory already exist
+- When the stream dies
