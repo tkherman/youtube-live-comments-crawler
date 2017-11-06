@@ -1,0 +1,8 @@
+Known bugs
+- When a directory already exist
+- When the stream dies
+- captions of videos not expanded
+
+
+Features to add
+- allow user to specify directory to save data
