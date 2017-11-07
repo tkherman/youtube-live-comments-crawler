@@ -65,6 +65,8 @@ class height_has_changed(object):
     Stream comments and write them to comments.txt
 """
 def stream_comments(dir_name, driver, shutdown):
+    # Set initial timer
+    last_scnshot = time.time()
     
     # Create a file called comments.txt
     textfile = open(dir_name + "/comments.txt", "w")
@@ -101,19 +103,9 @@ def stream_comments(dir_name, driver, shutdown):
         if shutdown():
             break
 
-
-
-
-"""
-    Worker function that take screenshots every minute
-"""
-def screenshot(dir_name, driver):
-    
-    # While loop that takes a screenshot every minute
-    while True:
-        driver.save_screenshot(dir_name + "/screenshots/" + str(time.time()) + ".png")
-        
-        time.sleep(60)
+        if time.time() - last_scnshot > 60:
+            last_scnshot = time.time()
+            driver.save_screenshot(dir_name + "/screenshots/" + str(time.time()) + ".png")
 
 
     
@@ -140,15 +132,6 @@ def crawl_link(url, shutdown):
 
     setup_directory(title)
 
-    # Create a new thread that take screenshot every minute
-    driver2 = webdriver.Chrome(chrome_options=options)
-    driver2.get(url)
-    print("Starting thread for screenshot")
-    t = threading.Thread(target = screenshot, args=(title, driver2,))
-    t.setDaemon(True) # ends screenshot thread when exiting program
-    t.start()
-    
-
     # Collect meta_data and write them to meta_data.txt
     collect_meta_data(title, driver1)
 
@@ -157,7 +140,6 @@ def crawl_link(url, shutdown):
     stream_comments(title, driver1, shutdown)
 
     driver1.close()
-    driver2.close()
 
 
 
