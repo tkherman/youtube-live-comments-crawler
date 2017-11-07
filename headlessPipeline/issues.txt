@@ -6,3 +6,6 @@ Known bugs
 
 Features to add
 - allow user to specify directory to save data
+
+
+https://intoli.com/blog/running-selenium-with-headless-chrome/
