@@ -1,6 +1,6 @@
 Known bugs
-- When a directory already exist
-- When the stream dies
+(Solved) When a directory already exist
+(Solved) When the stream dies
 - captions of videos not expanded
 
 

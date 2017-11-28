@@ -21,16 +21,16 @@ def get_links(keyword, number):
     url = "https://www.youtube.com/"
     url = url + "results?search_query=" + keyword # search query
     url = url + "&sp=EgJAAVAU" # live stream filter
-    
+
     options = webdriver.ChromeOptions()
     options.add_argument('headless')
-    options.add_argument('window-size=1200x600')
+    options.add_argument('window-size=1920x1080')
 
     driver = webdriver.Chrome(chrome_options=options)
     driver.get(url)
 
     videos = driver.find_elements_by_tag_name('ytd-video-renderer')
-    
+
     # Store links in list
     links = []
     n = 0
@@ -44,12 +44,12 @@ def get_links(keyword, number):
             break
 
     driver.close()
-    
+
     return links
 
 
 if __name__ == "__main__":
-    
+
     # Parse command line argument
     if len(sys.argv) != 4:
         usage(1)
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     keyword = sys.argv[1]
     number = int(sys.argv[2])
     timeout = int(sys.argv[3])
-    
+
     if number < 1 or number > 4:
         usage(1)
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
         t = threading.Thread(target = crawl_link, args=(link, lambda: shutdown,))
         threads.append(t)
         t.start()
-    
+
     # This blocks specified timeout
     print("Beginning countdown...")
     time.sleep(timeout*60)
